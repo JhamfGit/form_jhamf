@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formato de Registro de Proveedores y Contratistas - JHAMF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d68ac 0%, #51d6ee 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-info div {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e0e0e0;
+            position: relative;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #e8f0ff;
+            transform: translateX(5px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+
+        .references-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .reference-box {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #c0c8ff;
+        }
+
+        .reference-box h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .signature-area {
+            background: #f0f8ff;
+            border: 2px dashed #4facfe;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .signature-area:hover {
+            background: #e8f4ff;
+            border-color: #667eea;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #3f5bd3 0%, #11dee6 100%);
+            border-radius: 20px;
+            color: white;
+        }
+
+        .btn-submit {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: #f0f8ff;
+        }
+
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .form-content {
+                padding: 20px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .references-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .logo img {
+            max-height: 80px;   /* controla la altura del logo */
+            width: auto;        /* mantiene la proporción */
+            display: block;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .header-content {
+            flex: 1;
+            text-align: center;
+        }
+
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="container">
+            <div class="header">
+                <!-- Logo -->
+                <div class="logo">
+                    <img src="logo.png" alt="Logo de la empresa">
+                </div>
+
+                <!-- Contenido -->
+                <div class="header-content">
+                    <h1>FORMATO DE REGISTRO DE PROVEEDORES Y CONTRATISTAS</h1>
+                    <div class="header-info">
+                        <div><strong>Código:</strong> FO-GCA-32</div>
+                        <div><strong>Versión:</strong> 01</div>
+                        <div><strong>Fecha:</strong> <span id="currentDate"></span></div>
+                    </div>
+                </div>
+            </div>
+
+
+        <div class="form-content">
+            <div class="alert" id="alertMessage"></div>
+            
+            <form id="providerForm">
+                <!-- 1. INFORMACIÓN GENERAL DE LA EMPRESA -->
+                <div class="section">
+                    <h2>1. INFORMACIÓN GENERAL DE LA EMPRESA</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="razonSocial">Razón Social o Nombre:</label>
+                            <input type="text" id="razonSocial" name="razonSocial" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nit">NIT:</label>
+                            <input type="text" id="nit" name="nit" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombreComercial">Nombre Comercial:</label>
+                            <input type="text" id="nombreComercial" name="nombreComercial">
+                        </div>
+                        <div class="form-group">
+                            <label for="telefonoCelular">Teléfono / Celular:</label>
+                            <input type="tel" id="telefonoCelular" name="telefonoCelular" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="direccionPrincipal">Dirección Principal:</label>
+                            <input type="text" id="direccionPrincipal" name="direccionPrincipal" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ciudadDepartamento">Ciudad y Departamento:</label>
+                            <input type="text" id="ciudadDepartamento" name="ciudadDepartamento" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailCorporativo">Email Corporativo:</label>
+                            <input type="email" id="emailCorporativo" name="emailCorporativo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="horarioAtencion">Horario de Atención:</label>
+                            <input type="text" id="horarioAtencion" name="horarioAtencion">
+                        </div>
+                        <div class="form-group">
+                            <label for="nombreRepresentante">Nombre del Representante Legal:</label>
+                            <input type="text" id="nombreRepresentante" name="nombreRepresentante" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cc">CC:</label>
+                            <input type="text" id="cc" name="cc" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailRepresentante">Email del Representante Legal:</label>
+                            <input type="email" id="emailRepresentante" name="emailRepresentante">
+                        </div>
+                        <div class="form-group">
+                            <label for="telefonoRepresentante">Teléfono / Celular del Representante:</label>
+                            <input type="tel" id="telefonoRepresentante" name="telefonoRepresentante">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. INFORMACIÓN TRIBUTARIA -->
+                <div class="section">
+                    <h2>2. INFORMACIÓN TRIBUTARIA</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tipo de Persona:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="tipoPersona" value="Natural" required>
+                                    Natural
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="tipoPersona" value="Juridica" required>
+                                    Jurídica
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Régimen:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="regimen" value="Responsable de IVA" required>
+                                    Responsable de IVA
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="regimen" value="No Responsable de IVA" required>
+                                    No Responsable de IVA
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="codigoCIIU">Código CIIU:</label>
+                            <input type="text" id="codigoCIIU" name="codigoCIIU">
+                        </div>
+                        <div class="form-group">
+                            <label>Auto Retenedor:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="autoRetenedor" value="Si" required>
+                                    Sí
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="autoRetenedor" value="No" required>
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Retefuente:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="retefuente" value="Si" required>
+                                    Sí
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="retefuente" value="No" required>
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Reteica:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="reteica" value="Si" required>
+                                    Sí
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="reteica" value="No" required>
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Gran Contribuyente:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="granContribuyente" value="Si" required>
+                                    Sí
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="granContribuyente" value="No" required>
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. CONDICIONES DE PAGO -->
+                <div class="section">
+                    <h2>3. CONDICIONES DE PAGO</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Contado:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="contado" value="Si">
+                                    Sí
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="contado" value="No">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Crédito:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="credito" value="Si">
+                                    Sí
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                                    <input type="radio" name="credito" value="No">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="plazoEnDias">Plazo en días:</label>
+                            <input type="number" id="plazoEnDias" name="plazoEnDias">
+                        </div>
+                        <div class="form-group">
+                            <label for="entidadFinanciera">Entidad Financiera:</label>
+                            <input type="text" id="entidadFinanciera" name="entidadFinanciera">
+                        </div>
+                        <div class="form-group">
+                            <label for="numeroCuenta">Número de Cuenta:</label>
+                            <input type="text" id="numeroCuenta" name="numeroCuenta">
+                        </div>
+                        <div class="form-group">
+                            <label for="cuentaAhorros">Cuenta de Ahorros:</label>
+                            <input type="text" id="cuentaAhorros" name="cuentaAhorros">
+                        </div>
+                        <div class="form-group">
+                            <label for="cuentaCorriente">Cuenta Corriente:</label>
+                            <input type="text" id="cuentaCorriente" name="cuentaCorriente">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. INFORMACIÓN DE CONTACTOS -->
+                <div class="section">
+                    <h2>4. INFORMACIÓN DE CONTACTOS</h2>
+                    <div class="references-grid">
+                        <div class="reference-box">
+                            <h3>Contacto 1</h3>
+                            <div class="form-group">
+                                <label for="nombreContacto1">Nombre:</label>
+                                <input type="text" id="nombreContacto1" name="nombreContacto1">
+                            </div>
+                            <div class="form-group">
+                                <label for="correoContacto1">Correo:</label>
+                                <input type="email" id="correoContacto1" name="correoContacto1">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefonoContacto1">Teléfono / Celular:</label>
+                                <input type="tel" id="telefonoContacto1" name="telefonoContacto1">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoContacto1">Cargo:</label>
+                                <input type="text" id="cargoContacto1" name="cargoContacto1">
+                            </div>
+                        </div>
+                        <div class="reference-box">
+                            <h3>Contacto 2</h3>
+                            <div class="form-group">
+                                <label for="nombreContacto2">Nombre:</label>
+                                <input type="text" id="nombreContacto2" name="nombreContacto2">
+                            </div>
+                            <div class="form-group">
+                                <label for="correoContacto2">Correo:</label>
+                                <input type="email" id="correoContacto2" name="correoContacto2">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefonoContacto2">Teléfono / Celular:</label>
+                                <input type="tel" id="telefonoContacto2" name="telefonoContacto2">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoContacto2">Cargo:</label>
+                                <input type="text" id="cargoContacto2" name="cargoContacto2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. REFERENCIAS COMERCIALES -->
+                <div class="section">
+                    <h2>5. REFERENCIAS COMERCIALES</h2>
+                    <div class="references-grid">
+                        <div class="reference-box">
+                            <h3>Referencia 1</h3>
+                            <div class="form-group">
+                                <label for="razonSocialRef1">Razón Social o Nombre:</label>
+                                <input type="text" id="razonSocialRef1" name="razonSocialRef1">
+                            </div>
+                            <div class="form-group">
+                                <label for="nombreContactoRef1">Nombre Contacto:</label>
+                                <input type="text" id="nombreContactoRef1" name="nombreContactoRef1">
+                            </div>
+                            <div class="form-group">
+                                <label for="correoRef1">Correo:</label>
+                                <input type="email" id="correoRef1" name="correoRef1">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefonoRef1">Teléfono / Celular:</label>
+                                <input type="tel" id="telefonoRef1" name="telefonoRef1">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoRef1">Cargo:</label>
+                                <input type="text" id="cargoRef1" name="cargoRef1">
+                            </div>
+                        </div>
+                        <div class="reference-box">
+                            <h3>Referencia 2</h3>
+                            <div class="form-group">
+                                <label for="razonSocialRef2">Razón Social o Nombre:</label>
+                                <input type="text" id="razonSocialRef2" name="razonSocialRef2">
+                            </div>
+                            <div class="form-group">
+                                <label for="nombreContactoRef2">Nombre Contacto:</label>
+                                <input type="text" id="nombreContactoRef2" name="nombreContactoRef2">
+                            </div>
+                            <div class="form-group">
+                                <label for="correoRef2">Correo:</label>
+                                <input type="email" id="correoRef2" name="correoRef2">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefonoRef2">Teléfono / Celular:</label>
+                                <input type="tel" id="telefonoRef2" name="telefonoRef2">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoRef2">Cargo:</label>
+                                <input type="text" id="cargoRef2" name="cargoRef2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. REFERENCIAS BANCARIAS -->
+                <div class="section">
+                    <h2>6. REFERENCIAS BANCARIAS</h2>
+                    <div class="references-grid">
+                        <div class="reference-box">
+                            <h3>Referencia 1</h3>
+                            <div class="form-group">
+                                <label for="bancoBanc1">Banco:</label>
+                                <input type="text" id="bancoBanc1" name="bancoBanc1">
+                            </div>
+                            <div class="form-group">
+                                <label for="sucursalBanc1">Sucursal:</label>
+                                <input type="text" id="sucursalBanc1" name="sucursalBanc1">
+                            </div>
+                            <div class="form-group">
+                                <label for="correoBanc1">Correo:</label>
+                                <input type="email" id="correoBanc1" name="correoBanc1">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefonoBanc1">Teléfono / Celular:</label>
+                                <input type="tel" id="telefonoBanc1" name="telefonoBanc1">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoBanc1">Cargo:</label>
+                                <input type="text" id="cargoBanc1" name="cargoBanc1">
+                            </div>
+                        </div>
+                        <div class="reference-box">
+                            <h3>Referencia 2</h3>
+                            <div class="form-group">
+                                <label for="bancoBanc2">Banco:</label>
+                                <input type="text" id="bancoBanc2" name="bancoBanc2">
+                            </div>
+                            <div class="form-group">
+                                <label for="sucursalBanc2">Sucursal:</label>
+                                <input type="text" id="sucursalBanc2" name="sucursalBanc2">
+                            </div>
+                            <div class="form-group">
+                                <label for="correoBanc2">Correo:</label>
+                                <input type="email" id="correoBanc2" name="correoBanc2">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefonoBanc2">Teléfono / Celular:</label>
+                                <input type="tel" id="telefonoBanc2" name="telefonoBanc2">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoBanc2">Cargo:</label>
+                                <input type="text" id="cargoBanc2" name="cargoBanc2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. ESPECIALIDAD EN VENTAS -->
+                <div class="section">
+                    <h2>7. ESPECIALIDAD EN VENTAS</h2>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="computadores" name="especialidades" value="Computadores">
+                            <label for="computadores">Computadores</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="licenciamiento" name="especialidades" value="Licenciamiento">
+                            <label for="licenciamiento">Licenciamiento</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="seguridadInformatica" name="especialidades" value="Seguridad Informática">
+                            <label for="seguridadInformatica">Seguridad Informática</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="telefoniaIP" name="especialidades" value="Telefonía IP">
+                            <label for="telefoniaIP">Telefonía IP</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="suministros" name="especialidades" value="Suministros">
+                            <label for="suministros">Suministros</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="telecomunicaciones" name="especialidades" value="Telecomunicaciones">
+                            <label for="telecomunicaciones">Telecomunicaciones</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="servidores" name="especialidades" value="Servidores">
+                            <label for="servidores">Servidores</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="redes" name="especialidades" value="Redes">
+                            <label for="redes">Redes</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="perifericos" name="especialidades" value="Periféricos">
+                            <label for="perifericos">Periféricos</label>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="otrasEspecialidades">OTRO:</label>
+                        <textarea id="otrasEspecialidades" name="otrasEspecialidades" rows="3" placeholder="Especifique otras especialidades..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 8. TRATAMIENTO DE DATOS Y AUTORIZACIÓN -->
+                <div class="section">
+                    <h2>8. TRATAMIENTO DE DATOS Y AUTORIZACIÓN DE CONSULTA EN CENTRALES DE INFORMACIÓN FINANCIERA</h2>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6;">
+                        <p><strong>Con la suscripción de este documento autorizo a JHAMF GROUP SAS. a:</strong></p>
+                        <br>
+                        <p>1) Con base en la Ley 1581 de 2012 sobre Protección de Datos Personales, autorizo expresamente a JHAMF GROUP SAS., o a quien represente sus derechos, en forma permanente e irrevocable, para que con fines estadísticos y seguimiento de la gestión de información financiera o comercial, consulte, informe, reporte, procese o divulgue sobre mi comportamiento comercial, crediticio, financiero y en general, al igual que revelare mi información del negocio y como mi Proveedor, en el caso de ser requerida por una entidad competente en Colombia como la UIAF o la Fiscalía General de la Nación.</p>
+                        <br>
+                        <p>2) Ser contactado en las bases de datos que permitan prevenir el Lavado de Activos y Financiación del Terrorismo y la Financiación de la Proliferación de las Armas de destrucción Masivas.</p>
+                        <br>
+                        <p>Declaro que los recursos utilizados para el cumplimiento de las obligaciones a cargo, objeto del presente contrato no provienen ni provendrán de actividades ilícitas tales como el Narcotráfico, Terrorismo, Financiamiento del Terrorismo, o Financiamiento a la Proliferación de las Armas de destrucción Masiva o delitos contra el orden constitucional.</p>
+                        <br>
+                        <p><strong>JHAMF GROUP SAS. podrá terminar de manera unilateral e inmediata el presente contrato, cuando el proveedor y/o contratista llegaren a ser:</strong></p>
+                        <br>
+                        <p>1. vinculados por parte de las autoridades competentes a cualquier tipo de investigación por delitos de narcotráfico, terrorismo y financiación del terrorismo, lavado de activos, vinculación a delitos Contra el Orden Público de Secuestro extorsivo, vinculación a la Financiación de la Proliferación de las Armas de destrucción Masivas o delitos contra el orden constitucional.</p>
+                        <br>
+                        <p>2. Sea incluido en listas para el control de lavado de activos y financiación del terrorismo o Financiación de la Proliferación de las Armas de destrucción Masivas administradas por cualquier autoridad nacional o extranjera.</p>
+                        <br>
+                        <p>3. Sea condenado por parte de las autoridades competentes en cualquier tipo de proceso judicial o relacionado con la comisión de delitos de igual o similar naturaleza a los indicados en esta clausula.</p>
+                        <br>
+                        <p>4. El suscriptor de este documento se compromete a responsabilizarse y mantener libre de cualquier daño a JHAMF GROUP SAS por cualquier multa, perjuicio o sanción que sea probada y que sufran JHAMF GROUP SAS debido al incumplimiento de las obligaciones del suscriptor en materia de prevención de riesgo de lavado de activos, financiación del terrorismo o financiación de la proliferación de armas de destrucción masiva (AF/FT/FPAMD). Lo anterior incluye, pero no se limita a, cualquier reclamo judicial, extrajudicial y/o administrativo que autoridades competentes inicien en contra de JHAMF GROUP SAS por o con ocasión de dicho incumplimiento. MPS cuenta con un Sistema de Autocontrol y Gestión de Riesgo Integral en Lavado de Activos y Financiación del Terrorismo (SAGRILAFT), el cual le permite conocer a sus asociados de negocio y evitar cualquier contagio o relación con actividades ilícitas relacionadas con AF, FT o FPAMD. No obstante, el suscriptor asume plena responsabilidad por los actos u omisiones que puedan dar lugar a sanciones por incumplimiento de las disposiciones legales en esta materia. De igual manera, el proveedor y/o contratista se compromete a dar las explicaciones necesarias, tanto a JHAMF GROUP SAS como a los terceros que esta última le indique, originadas por el incumplimiento de lo mencionado anteriormente.</p>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: normal;">
+                            <input type="checkbox" id="aceptoTerminos" name="aceptoTerminos" required style="width: 20px; height: 20px;">
+                            <strong>Acepto los términos y condiciones de tratamiento de datos y autorización</strong>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 9. SOPORTES -->
+                <div class="section">
+                    <h2>9. SOPORTES</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Por favor adjunte los siguientes documentos:</p>
+                    
+                    <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h3 style="color: #2c5aa0; margin-bottom: 15px;">PERSONAS JURÍDICAS:</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="docExistencia" name="documentos" value="Certificado de existencia y representación legal">
+                                <label for="docExistencia">1. Certificado de existencia y representación legal con vigencia no mayor a 30 días</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="docRUT" name="documentos" value="RUT">
+                                <label for="docRUT">2. RUT</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="docCertBancario" name="documentos" value="Certificación bancaria">
+                                <label for="docCertBancario">3. Certificación bancaria no mayor a 30 días</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f0fff0; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h3 style="color: #2d5016; margin-bottom: 15px;">PERSONA NATURALES:</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="docFotocopia" name="documentos" value="Fotocopia cédula representante legal">
+                                <label for="docFotocopia">1. Fotocopia de la cédula del representante legal</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="docRUTNatural" name="documentos" value="RUT Natural">
+                                <label for="docRUTNatural">2. RUT</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="docCertBancarioNatural" name="documentos" value="Certificación bancaria natural">
+                                <label for="docCertBancarioNatural">3. Certificación bancaria no mayor a 30 días</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="signature-area">
+                        <h3 style="margin-bottom: 20px; color: #4facfe;">Firma Representante Legal</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nombreRepresentanteFirma">Nombre De Representante Legal:</label>
+                                <input type="text" id="nombreRepresentanteFirma" name="nombreRepresentanteFirma">
+                            </div>
+                            <div class="form-group">
+                                <label for="ccRepresentanteFirma">CC:</label>
+                                <input type="text" id="ccRepresentanteFirma" name="ccRepresentanteFirma">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. INFORMACIÓN USO EXCLUSIVO DE JHAMF GROUP SAS -->
+                <div class="section">
+                    <h2>10. INFORMACIÓN USO EXCLUSIVO DE JHAMF GROUP SAS</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="fechaVerificacion">Fecha de la Verificación:</label>
+                            <input type="date" id="fechaVerificacion" name="fechaVerificacion">
+                        </div>
+                        <div class="form-group">
+                            <label for="colaboradorVerificacion">Colaborador o firma de quien realizó la Verificación:</label>
+                            <input type="text" id="colaboradorVerificacion" name="colaboradorVerificacion">
+                        </div>
+                        <div class="form-group">
+                            <label for="cumplimiento">Cumplimiento:</label>
+                            <textarea id="cumplimiento" name="cumplimiento" rows="4" placeholder="Detalles del cumplimiento..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <h3 style="margin-bottom: 20px;">¿Estás listo para enviar tu registro?</h3>
+                    <button type="submit" class="btn-submit">
+                        ✓ REGISTRAR PROVEEDOR
+                    </button>
+                    <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.9;">
+                        Al enviar este formulario, los datos se guardarán en un archivo Excel
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    // Configurar fecha actual
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-ES');
+
+    // Crear partículas flotantes
+    function createParticles() {
+        const container = document.getElementById('particles');
+        const particleCount = 15;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.width = (Math.random() * 4 + 2) + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            container.appendChild(particle);
+        }
+    }
+
+    // Mostrar alerta
+    function showAlert(message, type = 'success') {
+        const alert = document.getElementById('alertMessage');
+        alert.textContent = message;
+        alert.className = `alert ${type}`;
+        alert.style.display = 'block';
+        
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    // Manejar envío del formulario
+    document.getElementById('providerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Recopilar datos del formulario
+        const formData = new FormData(this);
+        const data = {};
+        
+        // Campos individuales
+        for (let [key, value] of formData.entries()) {
+            if (key === 'especialidades' || key === 'documentos') {
+                if (!data[key]) data[key] = [];
+                data[key].push(value);
+            } else {
+                data[key] = value;
+            }
+        }
+        
+        // Convertir arrays a strings
+        if (data.especialidades) {
+            data.especialidades = data.especialidades.join(', ');
+        }
+        if (data.documentos) {
+            data.documentos = data.documentos.join(', ');
+        }
+        
+        // Agregar fecha de registro
+        data.fechaRegistro = new Date().toLocaleString('es-ES');
+
+        // Enviar datos al servidor (guardar_excel.php)
+        fetch("guardar_excel.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.success) {
+                showAlert('¡Registro guardado exitosamente en el servidor!', 'success');
+                // Limpiar formulario
+                document.getElementById('providerForm').reset();
+                // Scroll al inicio
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else {
+                showAlert('Error en el servidor: ' + response.msg, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error al guardar:', error);
+            showAlert('Error al guardar el registro. Por favor, inténtelo nuevamente.', 'error');
+        });
+    });
+
+    // Validación en tiempo real
+    document.querySelectorAll('input[required]').forEach(input => {
+        input.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                this.style.borderColor = '#ff6b6b';
+                this.style.backgroundColor = '#fff5f5';
+            } else {
+                this.style.borderColor = '#51cf66';
+                this.style.backgroundColor = '#f8fff8';
+            }
+        });
+    });
+
+    // Inicializar partículas
+    createParticles();
+
+    // Efectos de scroll suave para secciones
+    document.querySelectorAll('.section').forEach((section, index) => {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            section.style.transition = 'all 0.6s ease';
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+
+    // Sincronizar campos de representante legal
+    document.getElementById('nombreRepresentante').addEventListener('input', function() {
+        document.getElementById('nombreRepresentanteFirma').value = this.value;
+    });
+    
+    document.getElementById('cc').addEventListener('input', function() {
+        document.getElementById('ccRepresentanteFirma').value = this.value;
+    });
+</script>
+
+</body>
+</html>
